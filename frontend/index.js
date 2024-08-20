@@ -37,6 +37,8 @@ function moduleProject2() {
       row.appendChild(square)
       square.addEventListener('click', () => {
         // 👉 TASK 2 - Use a click handler to target a square 👈
+        document.querySelector(".targeted").classList.remove("targeted")
+          square.classList.add('targeted')
       })
     }
   }
@@ -64,12 +66,58 @@ function moduleProject2() {
   })
 
   document.addEventListener('keydown', evt => {
-    // 👉 TASK 3 - Use the arrow keys to highlight a new square 👈
+  const targetedElement = document.querySelector('.targeted');
+  const parentRow = targetedElement.parentElement;
+  const children = Array.from(parentRow.children); // Convert HTMLCollection to Array
 
-    // 👉 TASK 4 - Use the space bar to exterminate a mosquito 👈
+  let targetIndex = children.indexOf(targetedElement);
 
-    // 👉 TASK 5 - End the game 👈
-  })
+  // Handle movement based on the key pressed
+  if (evt.key === keys.up || evt.key === keys.down || evt.key === keys.left || evt.key === keys.right) {
+    // Remove the targeted class from the current element only when using arrow keys
+    targetedElement.classList.remove('targeted');
+
+    if (evt.key === keys.up && parentRow.previousElementSibling) {
+      parentRow.previousElementSibling.children[targetIndex].classList.add('targeted');
+    } else if (evt.key === keys.down && parentRow.nextElementSibling) {
+      parentRow.nextElementSibling.children[targetIndex].classList.add('targeted');
+    } else if (evt.key === keys.left) {
+      if (targetedElement.previousElementSibling) {
+        targetedElement.previousElementSibling.classList.add('targeted');
+      } else {
+        parentRow.lastElementChild.classList.add('targeted');
+      }
+    } else if (evt.key === keys.right) {
+      if (targetedElement.nextElementSibling) {
+        targetedElement.nextElementSibling.classList.add('targeted');
+      } else {
+        parentRow.firstElementChild.classList.add('targeted');
+      }
+    }
+  }
+
+  // 👉 TASK 4 - Use the space bar to exterminate a mosquito 👈
+  if (evt.key === keys.space && targetedElement.hasChildNodes()) {
+    targetedElement.firstChild.setAttribute('data-status','dead')
+    targetedElement.style.backgroundColor = "red";
+  }
+
+  // 👉 TASK 5 - End the game 👈
+  const livingMosq = document.querySelectorAll('[data-status="alive"]');
+  if(livingMosq.length === 0){
+    console.log("game over")
+
+    document.querySelector(".info").textContent = `Extermination completed in ${getTimeElapsed()/1000} seconds!`
+    let restart = document.createElement('button')
+    restart.textContent = 'Restart'
+
+    document.querySelector('header h2').appendChild(restart)
+    restart.addEventListener('click', () => {
+      window.location.reload();
+    })
+  }
+});
+  
   // 👆 WORK WORK ABOVE THIS LINE 👆
 }
 
